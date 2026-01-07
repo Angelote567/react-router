@@ -1,0 +1,128 @@
+.cart-page {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem 1rem;
+}
+
+.cart-title {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #333;
+}
+
+.cart-empty {
+  text-align: center;
+  color: #555;
+}
+
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.cart-item {
+  background: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cart-item-info h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.cart-item-info p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.cart-item-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+/* Botón secundario */
+
+.btn-secondary {
+  background: #e0e0e0;
+  color: #333;
+  padding: 0.45rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #d0d0d0;
+}
+
+/* Resumen */
+
+.cart-summary {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cart-total {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* Botón grande de checkout */
+
+.cart-actions-right {
+  text-align: right;
+}
+
+.cart-actions-right .btn-primary {
+  padding: 0.6rem 1.4rem;
+}
+
+.cart-qty {
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+}
+
+.cart-qty-label {
+  font-size: 0.85rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.cart-qty-input {
+  width: 48px;
+  height: 30px;
+  text-align: center;       
+  padding: 0;
+  border: 1.5px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.cart-qty-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
