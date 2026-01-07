@@ -7,11 +7,17 @@ from app.routes.checkout import router as checkout_router
 from app.routes.orders import router as orders_router
 from app.routes.auth import router as auth_router
 
-app = FastAPI()
+app = FastAPI(
+    title="E-commerce API",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
