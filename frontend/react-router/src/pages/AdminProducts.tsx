@@ -27,20 +27,7 @@ async function remove(id: number) {
   if (!confirm("¿Eliminar producto?")) return;
 
   try {
-    if (!token) throw new Error("No hay token. Inicia sesión otra vez.");
-
-    const res = await fetch(`${API_BASE}/products/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(text || `HTTP ${res.status}`);
-    }
-
+    await api<void>(`/products/${id}`, { method: "DELETE" });
     await load();
   } catch (e: any) {
     setErr(e?.message ?? String(e));
