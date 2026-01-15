@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-import bcrypt
+import bcrypt, os
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -64,3 +64,19 @@ def get_current_user(
         raise credentials_exception
 
     return user
+
+def is_admin_user(user: User) -> bool:
+    # 1) Admin “real” en DB
+    if getattr(user, "is_admin", False):
+        return True
+
+    # 2) Admin por variable de entorno (para producción en Render sin shell)
+    admin_email = os.getenv("ADMIN_EMAIL", "").strip().lower()
+    return bool(admin_email) and user.email.strip().lower() == admin_email
+
+
+def require_admin(user: User = Depends(get_current_user)) -> User:
+    if not is_admin_user(user):
+        raise HTTPException(status_code=403, detail="Admin only")
+    return user
+
