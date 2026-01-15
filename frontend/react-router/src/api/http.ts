@@ -6,7 +6,7 @@ function getUserEmailForOrders() {
 }
 
 function getToken() {
-  // ✅ tu AuthContext guarda el token aquí:
+  // tu AuthContext guarda el token aquí:
   return localStorage.getItem("auth:token") || "";
 }
 
@@ -22,7 +22,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set("Content-Type", "application/json");
   }
 
-  // ✅ añade Authorization para endpoints protegidos (DELETE/POST admin etc.)
+  // añade Authorization para endpoints protegidos (DELETE/POST admin etc.)
   if (token && !headers.has("Authorization")) {
     headers.set("Authorization", `Bearer ${token}`);
   }
