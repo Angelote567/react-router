@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../api/http";
+import { api, API_BASE } from "../api/http";
 import type { Product } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [err, setErr] = useState<string | null>(null);
+  const { token } = useAuth();
 
   async function load() {
     setErr(null);
@@ -20,16 +22,30 @@ export default function AdminProducts() {
   useEffect(() => {
     load();
   }, []);
+  
+async function remove(id: number) {
+  if (!confirm("¿Eliminar producto?")) return;
 
-  async function remove(id: number) {
-    if (!confirm("¿Eliminar producto?")) return;
-    try {
-      await api<void>(`/products/${id}`, { method: "DELETE" });
-      await load();
-    } catch (e: any) {
-      setErr(e?.message ?? String(e));
+  try {
+    if (!token) throw new Error("No hay token. Inicia sesión otra vez.");
+
+    const res = await fetch(`${API_BASE}/products/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(text || `HTTP ${res.status}`);
     }
+
+    await load();
+  } catch (e: any) {
+    setErr(e?.message ?? String(e));
   }
+}
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
