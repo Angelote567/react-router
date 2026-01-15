@@ -1,12 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, field_validator
 from sqlmodel import Session, select, delete
 
-from app.models.order import Order
-from app.models.order_item import OrderItem
 from app.db import get_session
 from app.models.user import User
-from app.auth import hash_password, verify_password, create_access_token, get_current_user
+from app.auth import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    get_current_user,
+    is_admin_email,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -34,6 +38,14 @@ def register(payload: RegisterIn, session: Session = Depends(get_session)):
 
     exists = session.exec(select(User).where(User.email == email)).first()
     if exists:
+        # (opcional) si ya existe y es el admin email, lo promovemos
+        if is_admin_email(email) and not exists.is_admin:
+            exists.is_admin = True
+            session.add(exists)
+            session.commit()
+            session.refresh(exists)
+            return {"id": exists.id, "email": exists.email, "is_admin": exists.is_admin}
+
         raise HTTPException(status_code=409, detail="Email already registered")
 
     if len(payload.password) < 6:
@@ -44,13 +56,14 @@ def register(payload: RegisterIn, session: Session = Depends(get_session)):
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
-    user = User(email=email, hashed_password=hashed, is_admin=False)
+    # ✅ CLAVE: si el email coincide con ADMIN_EMAIL -> se crea admin
+    user = User(email=email, hashed_password=hashed, is_admin=is_admin_email(email))
 
     session.add(user)
     session.commit()
     session.refresh(user)
 
-    return {"id": user.id, "email": user.email}
+    return {"id": user.id, "email": user.email, "is_admin": user.is_admin}
 
 
 @router.post("/login")
@@ -69,9 +82,9 @@ def login(payload: LoginIn, session: Session = Depends(get_session)):
 def me(user: User = Depends(get_current_user)):
     return {"id": user.id, "email": user.email, "is_admin": user.is_admin}
 
+
 @router.delete("/me", status_code=204)
 def delete_me(user: User = Depends(get_current_user), session: Session = Depends(get_session)):
     session.exec(delete(User).where(User.id == user.id))
     session.commit()
     return
-

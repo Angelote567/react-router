@@ -7,11 +7,9 @@ from app.auth import require_admin  # <-- IMPORTANTE
 
 router = APIRouter(prefix="/products", tags=["products"])
 
-
 @router.get("/", response_model=list[Product])
 def list_products(session: SessionDep):
     return session.exec(select(Product)).all()
-
 
 @router.post("/", response_model=Product, status_code=201)
 def create_product(
@@ -24,7 +22,6 @@ def create_product(
     session.commit()
     session.refresh(product)
     return product
-
 
 @router.get("/{product_id}", response_model=Product)
 def get_product(product_id: int, session: SessionDep):
