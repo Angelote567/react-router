@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { api } from "../api/http";
 import "./MyOrder.css";
 
 type OrderItem = {
@@ -32,24 +33,37 @@ export default function MyOrder() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated || !user?.email) {
-      setError("No has iniciado sesión.");
-      setOrders([]);
-      return;
+    let cancelled = false;
+
+    async function load() {
+      setError(null);
+
+      if (!isAuthenticated || !user?.email) {
+        setError("No has iniciado sesión.");
+        setOrders([]);
+        return;
+      }
+
+      try {
+        // IMPORTANTE: si tu backend usa X-User-Email,
+        // y tu api() lo añade desde localStorage("orders:user_email"),
+        // asegúrate de guardar ese email al hacer login.
+        const data = await api<Order[]>("/orders/my", {
+          method: "GET",
+          // Si quieres forzarlo aquí también (por si no está en localStorage):
+          headers: { "X-User-Email": user.email },
+        });
+
+        if (!cancelled) setOrders(data);
+      } catch (e: any) {
+        if (!cancelled) setError(String(e?.message ?? e));
+      }
     }
 
-    fetch("http://127.0.0.1:8000/orders/my", {
-      headers: { "X-User-Email": user.email },
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const txt = await res.text();
-          throw new Error(txt || "Error cargando pedidos");
-        }
-        return res.json();
-      })
-      .then(setOrders)
-      .catch((e) => setError(e.message));
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthenticated, user?.email]);
 
   if (error) {

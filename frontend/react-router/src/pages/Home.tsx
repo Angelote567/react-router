@@ -5,7 +5,8 @@ import type { Product } from "../context/CartContext";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000";
+export const API_BASE =
+  import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000";
 
 export default function Home() {
   const [products, setProducts] = useState<Product[]>([]);

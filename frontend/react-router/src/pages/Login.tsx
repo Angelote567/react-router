@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000";
+export const API_BASE =
+  import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000";
 
 export default function Login() {
   const [email, setEmail] = useState("");
