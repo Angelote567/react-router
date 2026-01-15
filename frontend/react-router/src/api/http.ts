@@ -2,18 +2,32 @@ export const API_BASE =
   import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000";
 
 function getUserEmailForOrders() {
-  // lo guardas en AuthContext (orders:user_email)
   return localStorage.getItem("orders:user_email") || "";
+}
+
+function getToken() {
+  // ✅ tu AuthContext guarda el token aquí:
+  return localStorage.getItem("auth:token") || "";
 }
 
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const email = getUserEmailForOrders();
+  const token = getToken();
 
-  // merge headers correctamente SIN perder los de init
   const headers = new Headers(init.headers || {});
-  if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
 
-  // añade el header solo si hay email (y si no lo han puesto ya)
+  // Content-Type solo si hay body y NO es FormData
+  const hasBody = init.body !== undefined && init.body !== null;
+  if (hasBody && !headers.has("Content-Type") && !(init.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  // ✅ añade Authorization para endpoints protegidos (DELETE/POST admin etc.)
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  // (opcional) header legacy que usabas para pedidos
   if (email && !headers.has("X-User-Email")) {
     headers.set("X-User-Email", email);
   }

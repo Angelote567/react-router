@@ -11,9 +11,10 @@ from sqlmodel import Session, select
 from app.db import get_session
 from app.models.user import User
 
-SECRET_KEY = "CHANGE_ME_SUPER_SECRET"
+SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME_SUPER_SECRET")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24h
+
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))  # 24h
 MAX_BCRYPT_BYTES = 72
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
