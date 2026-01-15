@@ -3,25 +3,29 @@ from sqlmodel import select
 
 from app.dependencies import SessionDep
 from app.models.product import Product, ProductCreate
-from app.auth import require_admin  # <-- IMPORTANTE
+from app.auth import require_admin
+from app.models.user import User
 
 router = APIRouter(prefix="/products", tags=["products"])
+
 
 @router.get("/", response_model=list[Product])
 def list_products(session: SessionDep):
     return session.exec(select(Product)).all()
 
+
 @router.post("/", response_model=Product, status_code=201)
 def create_product(
     product_in: ProductCreate,
     session: SessionDep,
-    _admin=Depends(require_admin),  # <-- SOLO ADMIN
+    admin: User = Depends(require_admin),
 ):
     product = Product.model_validate(product_in)
     session.add(product)
     session.commit()
     session.refresh(product)
     return product
+
 
 @router.get("/{product_id}", response_model=Product)
 def get_product(product_id: int, session: SessionDep):
@@ -36,7 +40,7 @@ def update_product(
     product_id: int,
     product_in: ProductCreate,
     session: SessionDep,
-    _admin=Depends(require_admin),  # <-- SOLO ADMIN
+    admin: User = Depends(require_admin),
 ):
     product = session.get(Product, product_id)
     if not product:
@@ -55,7 +59,7 @@ def update_product(
 def delete_product(
     product_id: int,
     session: SessionDep,
-    _admin=Depends(require_admin),  # <-- SOLO ADMIN
+    admin: User = Depends(require_admin),
 ):
     product = session.get(Product, product_id)
     if not product:
@@ -63,3 +67,4 @@ def delete_product(
 
     session.delete(product)
     session.commit()
+    return
