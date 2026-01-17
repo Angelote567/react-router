@@ -1,9 +1,10 @@
+from typing import TYPE_CHECKING
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr, field_validator
 from sqlmodel import Session, select, delete
 
 from app.db import get_session
-from app.models.user import User
 from app.auth import (
     hash_password,
     verify_password,
@@ -11,6 +12,10 @@ from app.auth import (
     get_current_user,
     is_admin_email,
 )
+
+if TYPE_CHECKING:
+    # Only for type checking (does not run at runtime → avoids circular import issues)
+    from app.models.user import User
 
 # Router for authentication and user management
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -38,6 +43,9 @@ class LoginIn(BaseModel):
 
 @router.post("/register", status_code=201)
 def register(payload: RegisterIn, session: Session = Depends(get_session)):
+    # Lazy import to prevent circular import problems on deploy
+    from app.models.user import User
+
     email = payload.email.strip().lower()
 
     exists = session.exec(select(User).where(User.email == email)).first()
@@ -72,6 +80,8 @@ def register(payload: RegisterIn, session: Session = Depends(get_session)):
 
 @router.post("/login")
 def login(payload: LoginIn, session: Session = Depends(get_session)):
+    from app.models.user import User
+
     email = payload.email.strip().lower()
 
     user = session.exec(select(User).where(User.email == email)).first()
@@ -83,16 +93,18 @@ def login(payload: LoginIn, session: Session = Depends(get_session)):
 
 
 @router.get("/me")
-def me(user: User = Depends(get_current_user)):
+def me(user=Depends(get_current_user)):
     # Return current authenticated user
     return {"id": user.id, "email": user.email, "is_admin": user.is_admin}
 
 
 @router.delete("/me", status_code=204)
 def delete_me(
-    user: User = Depends(get_current_user),
+    user=Depends(get_current_user),
     session: Session = Depends(get_session),
 ):
+    from app.models.user import User
+
     # Delete the currently authenticated user
     session.exec(delete(User).where(User.id == user.id))
     session.commit()
