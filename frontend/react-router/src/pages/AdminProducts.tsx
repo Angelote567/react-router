@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { api, API_BASE } from "../api/http";
+import { api } from "../api/http";
 import type { Product } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [err, setErr] = useState<string | null>(null);
-  const { token } = useAuth();
 
   async function load() {
     setErr(null);
@@ -22,17 +20,19 @@ export default function AdminProducts() {
   useEffect(() => {
     load();
   }, []);
-  
-async function remove(id: number) {
-  if (!confirm("¿Eliminar producto?")) return;
 
-  try {
-    await api<void>(`/products/${id}`, { method: "DELETE" });
-    await load();
-  } catch (e: any) {
-    setErr(e?.message ?? String(e));
+  async function remove(id: number) {
+    if (!confirm("¿Eliminar producto?")) return;
+
+    try {
+      await api<void>(`/products/${id}`, {
+        method: "DELETE",
+      });
+      await load();
+    } catch (e: any) {
+      setErr(e?.message ?? String(e));
+    }
   }
-}
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
