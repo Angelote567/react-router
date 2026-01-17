@@ -12,22 +12,26 @@ from app.auth import (
     is_admin_email,
 )
 
+# Router for authentication and user management
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 class RegisterIn(BaseModel):
+    # User registration payload
     email: EmailStr
     password: str
 
     @field_validator("password")
     @classmethod
     def password_max_72_bytes(cls, v: str):
+        # Enforce bcrypt password size limit
         if len(v.encode("utf-8")) > 72:
-            raise ValueError("La contraseña no puede superar 72 bytes (bcrypt).")
+            raise ValueError("Password cannot exceed 72 bytes (bcrypt limit).")
         return v
 
 
 class LoginIn(BaseModel):
+    # User login payload
     email: EmailStr
     password: str
 
@@ -38,7 +42,7 @@ def register(payload: RegisterIn, session: Session = Depends(get_session)):
 
     exists = session.exec(select(User).where(User.email == email)).first()
     if exists:
-        # (opcional) si ya existe y es el admin email, lo promovemos
+        # (optional) if user already exists and matches ADMIN_EMAIL, promote to admin
         if is_admin_email(email) and not exists.is_admin:
             exists.is_admin = True
             session.add(exists)
@@ -49,14 +53,14 @@ def register(payload: RegisterIn, session: Session = Depends(get_session)):
         raise HTTPException(status_code=409, detail="Email already registered")
 
     if len(payload.password) < 6:
-        raise HTTPException(status_code=400, detail="Password too short (min 6)")
+        raise HTTPException(status_code=400, detail="Password too short (min 6 characters)")
 
     try:
         hashed = hash_password(payload.password)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
-    # ✅ CLAVE: si el email coincide con ADMIN_EMAIL -> se crea admin
+    # Key detail: if email matches ADMIN_EMAIL, user is created as admin
     user = User(email=email, hashed_password=hashed, is_admin=is_admin_email(email))
 
     session.add(user)
@@ -80,11 +84,16 @@ def login(payload: LoginIn, session: Session = Depends(get_session)):
 
 @router.get("/me")
 def me(user: User = Depends(get_current_user)):
+    # Return current authenticated user
     return {"id": user.id, "email": user.email, "is_admin": user.is_admin}
 
 
 @router.delete("/me", status_code=204)
-def delete_me(user: User = Depends(get_current_user), session: Session = Depends(get_session)):
+def delete_me(
+    user: User = Depends(get_current_user),
+    session: Session = Depends(get_session),
+):
+    # Delete the currently authenticated user
     session.exec(delete(User).where(User.id == user.id))
     session.commit()
     return

@@ -15,16 +15,20 @@ type AuthContextType = {
   logout: () => void;
 };
 
+// Authentication context
 const AuthContext = createContext<AuthContextType | null>(null);
 
+// LocalStorage keys
 const LS_TOKEN = "auth:token";
 const LS_USER = "auth:user";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  // Initialize token from localStorage
   const [token, setToken] = useState<string | null>(
     () => localStorage.getItem(LS_TOKEN)
   );
 
+  // Initialize user from localStorage
   const [user, setUser] = useState<AuthUser | null>(() => {
     const raw = localStorage.getItem(LS_USER);
     return raw ? JSON.parse(raw) : null;
@@ -40,6 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isAuthenticated,
       isAdmin,
 
+      // Store auth data and update state
       login(token: string, user: AuthUser) {
         localStorage.setItem(LS_TOKEN, token);
         localStorage.setItem(LS_USER, JSON.stringify(user));
@@ -47,6 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(user);
       },
 
+      // Clear auth data and reset state
       logout() {
         localStorage.removeItem(LS_TOKEN);
         localStorage.removeItem(LS_USER);
@@ -61,6 +67,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth debe usarse dentro de <AuthProvider />");
+  if (!ctx) {
+    throw new Error("useAuth must be used within an <AuthProvider />");
+  }
   return ctx;
 }

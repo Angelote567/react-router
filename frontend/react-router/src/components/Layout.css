@@ -1,9 +1,11 @@
+/* Main layout wrapper */
 .layout {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
+/* Top header bar */
 .header {
   border-bottom: 1px solid #e5e7eb;
   background: white;
@@ -12,6 +14,7 @@
   z-index: 10;
 }
 
+/* Navigation container */
 .nav {
   max-width: 980px;
   margin: 0 auto;
@@ -21,6 +24,7 @@
   align-items: center;
 }
 
+/* Base style for navigation links and buttons */
 .nav-link {
   font-size: 14px;
   padding: 7px 10px;
@@ -32,23 +36,28 @@
   cursor: pointer;
 }
 
+/* Hover effect for navigation links */
 .nav-link:hover {
   background: #f3f4f6;
 }
 
+/* Active navigation link */
 .active {
   border-color: #e5e7eb;
   background: #f9fafb;
 }
 
+/* Spacer to push items to the right */
 .spacer {
   flex: 1;
 }
 
+/* Logout button specific styling */
 .logout-button {
   border: 1px solid #e5e7eb;
 }
 
+/* User email badge */
 .user-pill {
   font-size: 12px;
   padding: 6px 10px;
@@ -58,6 +67,7 @@
   background: #f9fafb;
 }
 
+/* Main page content area */
 .main {
   flex: 1;
   max-width: 980px;

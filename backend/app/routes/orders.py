@@ -8,10 +8,12 @@ from app.models.product import Product
 from app.models.order import Order
 from app.models.order_item import OrderItem
 
+# Router for order-related endpoints
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 
 def require_user_email(x_user_email: Optional[str]) -> str:
+    # Validate presence of X-User-Email header
     if not x_user_email or not x_user_email.strip():
         raise HTTPException(status_code=401, detail="Missing X-User-Email header")
     return x_user_email.strip()
@@ -24,14 +26,14 @@ def create_order(
     x_user_email: Optional[str] = Header(default=None, convert_underscores=False, alias="X-User-Email"),
 ):
     """
-    Crea un pedido para el usuario del header X-User-Email.
-    payload ejemplo: { "items": [ {"product_id": 1, "quantity": 2}, ... ] }
+    Create an order for the user identified by the X-User-Email header.
+    Example payload: { "items": [ {"product_id": 1, "quantity": 2}, ... ] }
     """
     user_email = require_user_email(x_user_email)
 
     items = payload.get("items", [])
     if not items:
-        raise HTTPException(status_code=400, detail="Cart vacío")
+        raise HTTPException(status_code=400, detail="Empty cart")
 
     product_ids = [int(i["product_id"]) for i in items]
     products = session.exec(select(Product).where(Product.id.in_(product_ids))).all()
@@ -46,27 +48,27 @@ def create_order(
 
         p = products_map.get(pid)
         if not p:
-            raise HTTPException(status_code=404, detail=f"Producto {pid} no existe")
+            raise HTTPException(status_code=404, detail=f"Product {pid} does not exist")
         if qty < 1:
-            raise HTTPException(status_code=400, detail="Cantidad inválida")
+            raise HTTPException(status_code=400, detail="Invalid quantity")
         if p.stock < qty:
-            raise HTTPException(status_code=409, detail=f"Sin stock suficiente para {p.title}")
+            raise HTTPException(status_code=409, detail=f"Not enough stock for {p.title}")
 
         currency = currency or p.currency
         if p.currency != currency:
-            raise HTTPException(status_code=400, detail="Moneda mezclada no soportada")
+            raise HTTPException(status_code=400, detail="Mixed currencies are not supported")
 
         total_cents += p.price_cents * qty
 
     order = Order(
         user_email=user_email,
-        status="paid",  # o "pending" si luego metes Stripe
+        status="paid",  # or "pending" if Stripe is added later
         total_cents=total_cents,
         currency=currency or "EUR",
         created_at=datetime.utcnow(),
     )
     session.add(order)
-    session.flush()  # para order.id
+    session.flush()  # needed to get order.id
 
     for it in items:
         pid = int(it["product_id"])
@@ -81,6 +83,7 @@ def create_order(
         )
         session.add(oi)
 
+        # Reduce product stock
         p.stock -= qty
         session.add(p)
 
@@ -95,8 +98,8 @@ def my_orders(
     x_user_email: Optional[str] = Header(default=None, convert_underscores=False, alias="X-User-Email"),
 ):
     """
-    Devuelve los pedidos del usuario (por X-User-Email),
-    con items incluidos, ordenados del más reciente al más antiguo.
+    Return all orders for the current user (from X-User-Email header),
+    including items, ordered from newest to oldest.
     """
     user_email = require_user_email(x_user_email)
 
@@ -110,11 +113,10 @@ def my_orders(
     order_ids = [o.id for o in orders]
     items = session.exec(select(OrderItem).where(OrderItem.order_id.in_(order_ids))).all()
 
-    # cargar productos de todos los items en 1 query
+    # Load all related products in a single query
     product_ids = list({it.product_id for it in items})
     products = session.exec(select(Product).where(Product.id.in_(product_ids))).all()
     products_map = {p.id: p for p in products}
-
 
     items_by_order = {}
     for it in items:
@@ -128,7 +130,7 @@ def my_orders(
             }
         )
 
-    # Formato exacto que espera tu MyOrder.tsx
+    # Exact response format expected by MyOrder.tsx
     return [
         {
             "id": o.id,

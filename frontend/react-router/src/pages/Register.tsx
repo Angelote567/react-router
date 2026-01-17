@@ -1,32 +1,36 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import "./Register.css";
 
 export const API_BASE =
   import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000";
 
+// Register page (styled like Login)
 export default function Register() {
-  const nav = useNavigate();
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [err, setErr] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function onSubmit(e: React.FormEvent) {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErr(null);
+    setError(null);
     setLoading(true);
 
     try {
       const res = await fetch(`${API_BASE}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), password }),
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
       });
 
       if (!res.ok) {
-        // FastAPI suele devolver { detail: ... }
-        let msg = "No se pudo registrar";
+        let msg = "Registration failed";
         try {
           const data = await res.json();
           msg = data?.detail ?? msg;
@@ -34,49 +38,47 @@ export default function Register() {
           const text = await res.text().catch(() => "");
           if (text) msg = text;
         }
-        setErr(msg);
+        setError(msg);
         return;
       }
 
-      // Registro OK -> a login
-      nav("/login", { replace: true });
+      // Successful registration → go to login
+      navigate("/login", { replace: true });
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
-    <div style={{ maxWidth: 420, margin: "40px auto" }}>
-      <h1 style={{ marginTop: 0 }}>Registro</h1>
+    <div className="register-page">
+      <h2>Register</h2>
 
-      <form onSubmit={onSubmit} style={{ display: "grid", gap: 10 }}>
+      <form className="register-form" onSubmit={submit}>
         <input
+          type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ padding: 10, borderRadius: 12, border: "1px solid #e5e7eb" }}
-          type="email"
           required
         />
 
         <input
-          placeholder="Contraseña"
+          type="password"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: 10, borderRadius: 12, border: "1px solid #e5e7eb" }}
-          type="password"
           required
         />
 
-        {err && <div style={{ color: "crimson" }}>{err}</div>}
+        {error && <div className="error">{error}</div>}
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Creando..." : "Crear cuenta"}
+        <button className="btn-primary" type="submit" disabled={loading}>
+          {loading ? "Creating..." : "Create account"}
         </button>
       </form>
 
-      <p style={{ marginTop: 12 }}>
-        ¿Ya tienes cuenta? <Link to="/login">Inicia sesión</Link>
+      <p className="info">
+        Already have an account? <Link to="/login">Log in</Link>
       </p>
     </div>
   );

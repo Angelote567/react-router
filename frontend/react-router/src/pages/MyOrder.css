@@ -1,13 +1,16 @@
+/* Orders page container */
 .orders {
   max-width: 900px;
   margin: 0 auto;
   padding: 24px 16px;
 }
 
+/* Page title */
 .orders h2 {
   margin: 0 0 16px;
 }
 
+/* Error message box */
 .error {
   padding: 12px 14px;
   border: 1px solid #ff6b6b;
@@ -16,11 +19,13 @@
   color: #b42318;
 }
 
+/* Orders list layout */
 .orders-list {
   display: grid;
   gap: 14px;
 }
 
+/* Single order card */
 .order-card {
   border: 1px solid #e8e8e8;
   border-radius: 14px;
@@ -29,6 +34,7 @@
   overflow: hidden;
 }
 
+/* Order header section */
 .order-head {
   display: flex;
   justify-content: space-between;
@@ -38,27 +44,32 @@
   background: #fafafa;
 }
 
+/* Order title (ID or label) */
 .order-title {
   font-weight: 700;
 }
 
+/* Order subtitle (date, status, etc.) */
 .order-sub {
   margin-top: 4px;
   font-size: 13px;
   color: #666;
 }
 
+/* Order total amount */
 .order-total {
   font-weight: 800;
   white-space: nowrap;
 }
 
+/* Order items container */
 .order-items {
   padding: 10px 16px 14px;
   display: grid;
   gap: 10px;
 }
 
+/* Single order item row */
 .order-item {
   display: flex;
   justify-content: space-between;
@@ -68,10 +79,12 @@
   border-radius: 12px;
 }
 
+/* Item title */
 .item-title {
   font-weight: 600;
 }
 
+/* Item metadata (price, quantity, etc.) */
 .item-meta {
   color: #666;
   white-space: nowrap;

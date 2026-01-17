@@ -23,6 +23,7 @@ type CartContextValue = {
   clearCart: () => void;
 };
 
+// Shopping cart context
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
@@ -31,6 +32,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<CartContextValue>(() => {
     return {
       items,
+
+      // Add a product to the cart (or increase quantity if it already exists)
       addToCart(product) {
         setItems((prev) => {
           const idx = prev.findIndex((x) => x.product.id === product.id);
@@ -42,15 +45,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           return [...prev, { product, quantity: 1 }];
         });
       },
+
+      // Remove a product from the cart
       removeFromCart(productId) {
         setItems((prev) => prev.filter((x) => x.product.id !== productId));
       },
+
+      // Set product quantity (minimum 1)
       setQuantity(productId, quantity) {
         const q = Math.max(1, Math.floor(quantity || 1));
         setItems((prev) =>
-          prev.map((x) => (x.product.id === productId ? { ...x, quantity: q } : x))
+          prev.map((x) =>
+            x.product.id === productId ? { ...x, quantity: q } : x
+          )
         );
       },
+
+      // Clear all cart items
       clearCart() {
         setItems([]);
       },
@@ -62,6 +73,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart debe usarse dentro de <CartProvider />");
+  if (!ctx) {
+    throw new Error("useCart must be used within a <CartProvider />");
+  }
   return ctx;
 }

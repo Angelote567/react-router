@@ -7,7 +7,7 @@ import "./CreateProduct.css";
 type FormState = {
   title: string;
   description: string;
-  price: string; // en euros
+  price: string; // in euros
   stock: string;
   slug: string;
   currency: string;
@@ -23,6 +23,7 @@ type ProductApi = {
   slug?: string | null;
 };
 
+// Admin form to edit an existing product
 export default function EditProduct() {
   const { productId } = useParams();
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ export default function EditProduct() {
       setError(null);
 
       if (!productId) {
-        setError("Producto inválido.");
+        setError("Invalid product.");
         setLoading(false);
         return;
       }
@@ -57,7 +58,7 @@ export default function EditProduct() {
       try {
         const data = await api<ProductApi>(`/products/${productId}`, {
           method: "GET",
-          // Si tu backend requiere admin incluso para leer, descomenta:
+          // If your backend requires admin even for reading, uncomment:
           // headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         });
 
@@ -73,7 +74,7 @@ export default function EditProduct() {
         });
       } catch (err: any) {
         console.error(err);
-        if (!cancelled) setError(err?.message ? String(err.message) : "No se pudo cargar el producto.");
+        if (!cancelled) setError(err?.message ? String(err.message) : "The product could not be loaded.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -98,12 +99,13 @@ export default function EditProduct() {
     setSuccess(null);
 
     if (!productId) {
-      setError("Producto inválido.");
+      setError("Invalid product.");
       return;
     }
 
+    // Require authentication (admin)
     if (!token) {
-      setError("No estás autenticado. Inicia sesión como admin.");
+      setError("You are not authenticated. Please log in as an admin.");
       return;
     }
 
@@ -111,20 +113,21 @@ export default function EditProduct() {
     const stockNumber = Number(form.stock);
 
     if (!form.title.trim()) {
-      setError("El título es obligatorio.");
+      setError("Title is required.");
       return;
     }
 
     if (isNaN(priceNumber) || priceNumber <= 0) {
-      setError("El precio debe ser un número mayor que 0.");
+      setError("Price must be a number greater than 0.");
       return;
     }
 
     if (isNaN(stockNumber) || stockNumber < 0) {
-      setError("El stock debe ser un número mayor o igual que 0.");
+      setError("Stock must be a number greater than or equal to 0.");
       return;
     }
 
+    // Generate slug from title if not provided
     const slug =
       form.slug.trim() ||
       form.title
@@ -154,35 +157,35 @@ export default function EditProduct() {
         body: JSON.stringify(body),
       });
 
-      setSuccess("Producto actualizado correctamente ✅");
+      setSuccess("Product updated successfully ✅");
       setTimeout(() => navigate("/admin/products"), 800);
     } catch (err: any) {
       console.error(err);
-      setError(err?.message ? String(err.message) : "No se pudo actualizar el producto.");
+      setError(err?.message ? String(err.message) : "The product could not be updated.");
     } finally {
       setSaving(false);
     }
   };
 
   if (loading) {
-    return <p style={{ textAlign: "center" }}>Cargando producto...</p>;
+    return <p style={{ textAlign: "center" }}>Loading product...</p>;
   }
 
   return (
     <div className="create-product">
-      <h1>Editar producto</h1>
+      <h1>Edit product</h1>
 
       <form className="create-form" onSubmit={handleSubmit}>
         {error && <p className="error">{error}</p>}
         {success && <p className="success">{success}</p>}
 
         <div className="form-group">
-          <label htmlFor="title">Título</label>
+          <label htmlFor="title">Title</label>
           <input id="title" name="title" value={form.title} onChange={handleChange} />
         </div>
 
         <div className="form-group">
-          <label htmlFor="description">Descripción</label>
+          <label htmlFor="description">Description</label>
           <textarea
             id="description"
             name="description"
@@ -194,7 +197,7 @@ export default function EditProduct() {
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="price">Precio (€)</label>
+            <label htmlFor="price">Price (€)</label>
             <input id="price" name="price" value={form.price} onChange={handleChange} />
           </div>
 
@@ -206,7 +209,7 @@ export default function EditProduct() {
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="currency">Moneda</label>
+            <label htmlFor="currency">Currency</label>
             <select id="currency" name="currency" value={form.currency} onChange={handleChange}>
               <option value="EUR">EUR</option>
               <option value="USD">USD</option>
@@ -221,7 +224,7 @@ export default function EditProduct() {
 
         <div className="form-actions">
           <button className="submit-btn" type="submit" disabled={saving}>
-            {saving ? "Guardando..." : "Guardar cambios"}
+            {saving ? "Saving..." : "Save changes"}
           </button>
         </div>
 
@@ -231,7 +234,7 @@ export default function EditProduct() {
           className="btn-secondary"
           style={{ marginBottom: "1rem" }}
         >
-          Volver
+          Back
         </button>
       </form>
     </div>

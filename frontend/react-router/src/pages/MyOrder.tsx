@@ -21,6 +21,7 @@ type Order = {
 };
 
 function money(cents: number, currency: string) {
+  // Format cents to a currency string
   return new Intl.NumberFormat("es-ES", {
     style: "currency",
     currency,
@@ -39,18 +40,18 @@ export default function MyOrder() {
       setError(null);
 
       if (!isAuthenticated || !user?.email) {
-        setError("No has iniciado sesión.");
+        setError("You are not logged in.");
         setOrders([]);
         return;
       }
 
       try {
-        // IMPORTANTE: si tu backend usa X-User-Email,
-        // y tu api() lo añade desde localStorage("orders:user_email"),
-        // asegúrate de guardar ese email al hacer login.
+        // Important: if your backend uses X-User-Email,
+        // and your api() adds it from localStorage("orders:user_email"),
+        // make sure you store that email during login.
         const data = await api<Order[]>("/orders/my", {
           method: "GET",
-          // Si quieres forzarlo aquí también (por si no está en localStorage):
+          // If you want to enforce it here too (in case it's not in localStorage):
           headers: { "X-User-Email": user.email },
         });
 
@@ -69,27 +70,27 @@ export default function MyOrder() {
   if (error) {
     return (
       <div className="orders">
-        <h2>Mis pedidos</h2>
+        <h2>My Orders</h2>
         <p className="error">{error}</p>
       </div>
     );
   }
 
-  if (orders === null) return <div className="orders">Cargando…</div>;
+  if (orders === null) return <div className="orders">Loading…</div>;
 
   return (
     <div className="orders">
-      <h2>Mis pedidos</h2>
+      <h2>My Orders</h2>
 
       {orders.length === 0 ? (
-        <p>No tienes pedidos todavía.</p>
+        <p>You do not have any orders yet.</p>
       ) : (
         <div className="orders-list">
           {orders.map((o) => (
             <div className="order-card" key={o.id}>
               <div className="order-head">
                 <div>
-                  <div className="order-title">Pedido #{o.id}</div>
+                  <div className="order-title">Order #{o.id}</div>
                   <div className="order-sub">
                     {new Date(o.created_at).toLocaleString("es-ES")} · {o.status}
                   </div>

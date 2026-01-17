@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { api } from "../api/http";
 import type { Product } from "../context/CartContext";
 
+// Admin page to manage products
 export default function AdminProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
+  // Load all products from the API
   async function load() {
     setErr(null);
     try {
@@ -21,8 +23,9 @@ export default function AdminProducts() {
     load();
   }, []);
 
+  // Delete a product by ID
   async function remove(id: number) {
-    if (!confirm("¿Eliminar producto?")) return;
+    if (!confirm("Delete product?")) return;
 
     try {
       await api<void>(`/products/${id}`, {
@@ -37,7 +40,7 @@ export default function AdminProducts() {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1 style={{ margin: 0 }}>Admin: productos</h1>
+        <h1 style={{ margin: 0 }}>Admin: Products</h1>
         <Link
           to="/admin/products/new"
           style={{
@@ -49,14 +52,14 @@ export default function AdminProducts() {
             color: "white",
           }}
         >
-          + Nuevo
+          + New
         </Link>
       </div>
 
       {err && <p style={{ color: "crimson", margin: 0 }}>Error: {err}</p>}
 
       {products.length === 0 ? (
-        <p>No hay productos.</p>
+        <p>No products found.</p>
       ) : (
         <div style={{ display: "grid", gap: 10 }}>
           {products.map((p) => (
@@ -91,7 +94,7 @@ export default function AdminProducts() {
                     background: "white",
                   }}
                 >
-                  Editar
+                  Edit
                 </Link>
                 <button
                   onClick={() => remove(p.id)}
@@ -103,7 +106,7 @@ export default function AdminProducts() {
                     background: "white",
                   }}
                 >
-                  Eliminar
+                  Delete
                 </button>
               </div>
             </div>

@@ -4,6 +4,7 @@ import { api } from "../api/http";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 
+// Shopping cart page
 export default function Cart() {
   const nav = useNavigate();
   const { items, setQuantity, removeFromCart, clearCart } = useCart();
@@ -12,6 +13,7 @@ export default function Cart() {
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
+  // Calculate total cart price
   const total = useMemo(() => {
     return items.reduce((sum, it) => sum + it.product.price_cents * it.quantity, 0);
   }, [items]);
@@ -20,8 +22,9 @@ export default function Cart() {
     setMsg(null);
     setErr(null);
 
+    // Require authentication before checkout
     if (!isAuthenticated || !user?.email) {
-      setErr("Tienes que iniciar sesión para comprar.");
+      setErr("You must log in to complete the purchase.");
       nav("/login");
       return;
     }
@@ -34,14 +37,14 @@ export default function Cart() {
     };
 
     try {
-      // 1) validate cart
+      // 1) Validate cart
       await api<{ ok: true }>("/checkout/validate", {
         method: "POST",
         headers: { "X-User-Email": user.email },
         body: JSON.stringify(payload),
       });
 
-      // 2) create order
+      // 2) Create order
       const order = await api<{ id: number }>("/orders/", {
         method: "POST",
         headers: { "X-User-Email": user.email },
@@ -49,12 +52,12 @@ export default function Cart() {
       });
 
       clearCart();
-      setMsg(`Pedido creado: #${order.id}`);
+      setMsg(`Order created: #${order.id}`);
 
-      // llévalo directo a "Mis pedidos" para que lo vea
+      // Redirect user to "My Orders"
       nav("/orders");
     } catch (e: any) {
-      // Intentamos parsear el error del backend (que suele venir como JSON string)
+      // Try to parse backend error (usually returned as a JSON string)
       const raw = e?.message ?? String(e);
 
       try {
@@ -64,29 +67,30 @@ export default function Cart() {
         const first = detail?.errors?.[0];
         if (first?.reason === "OUT_OF_STOCK") {
           setErr(
-            `No queda suficiente stock para completar la compra. Disponible: ${first.stock}, solicitado: ${first.requested}.`
+            `Not enough stock to complete the purchase. Available: ${first.stock}, requested: ${first.requested}.`
           );
           return;
         }
 
-        // fallback: si viene un detail tipo string
+        // Fallback when detail is a string
         if (typeof detail === "string") {
           setErr(detail);
           return;
         }
       } catch {
-        // si no es JSON, seguimos con fallback
+        // If not JSON, fall back to generic error
       }
-      setErr("No se pudo validar el carrito. Revisa las cantidades y vuelve a intentarlo.");
+
+      setErr("The cart could not be validated. Please check quantities and try again.");
     }
   }
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <h1 style={{ margin: 0 }}>Carrito</h1>
+      <h1 style={{ margin: 0 }}>Cart</h1>
 
       {items.length === 0 ? (
-        <p>Tu carrito está vacío.</p>
+        <p>Your cart is empty.</p>
       ) : (
         <>
           <div style={{ display: "grid", gap: 10 }}>
@@ -128,7 +132,7 @@ export default function Cart() {
                       background: "white",
                     }}
                   >
-                    Quitar
+                    Remove
                   </button>
                 </div>
               </div>
@@ -136,7 +140,9 @@ export default function Cart() {
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div style={{ fontWeight: 800 }}>Total: {(total / 100).toFixed(2)}</div>
+            <div style={{ fontWeight: 800 }}>
+              Total: {(total / 100).toFixed(2)}
+            </div>
             <button
               onClick={validateAndCheckout}
               style={{
@@ -148,7 +154,7 @@ export default function Cart() {
                 color: "white",
               }}
             >
-              Validar y comprar
+              Validate and purchase
             </button>
           </div>
 

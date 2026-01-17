@@ -6,11 +6,13 @@ from app.models.product import Product, ProductCreate
 from app.auth import require_admin
 from app.models.user import User
 
+# Router for product-related endpoints
 router = APIRouter(prefix="/products", tags=["products"])
 
 
 @router.get("/", response_model=list[Product])
 def list_products(session: SessionDep):
+    # Return all products from the database
     return session.exec(select(Product)).all()
 
 
@@ -20,6 +22,7 @@ def create_product(
     session: SessionDep,
     admin: User = Depends(require_admin),
 ):
+    # Create a new product (admin only)
     product = Product.model_validate(product_in)
     session.add(product)
     session.commit()
@@ -29,6 +32,7 @@ def create_product(
 
 @router.get("/{product_id}", response_model=Product)
 def get_product(product_id: int, session: SessionDep):
+    # Retrieve a single product by ID
     product = session.get(Product, product_id)
     if not product:
         raise HTTPException(status_code=404)
@@ -42,6 +46,7 @@ def update_product(
     session: SessionDep,
     admin: User = Depends(require_admin),
 ):
+    # Update an existing product (admin only)
     product = session.get(Product, product_id)
     if not product:
         raise HTTPException(status_code=404)
@@ -61,6 +66,7 @@ def delete_product(
     session: SessionDep,
     admin: User = Depends(require_admin),
 ):
+    # Delete a product by ID (admin only)
     product = session.get(Product, product_id)
     if not product:
         raise HTTPException(status_code=404)

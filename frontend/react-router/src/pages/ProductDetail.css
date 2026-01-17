@@ -1,9 +1,11 @@
+/* Product detail page container */
 .product-detail-page {
   max-width: 700px;
   margin: 2rem auto;
   padding: 2rem 1rem;
 }
 
+/* Product detail card */
 .product-detail-card {
   background: white;
   padding: 2rem;
@@ -11,17 +13,20 @@
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
 }
 
+/* Product title */
 .product-detail-title {
   margin: 0 0 1rem;
   color: #333;
 }
 
+/* Product description */
 .product-detail-description {
   margin: 0;
   color: #555;
   line-height: 1.5;
 }
 
+/* Product price */
 .product-detail-price {
   font-size: 1.4rem;
   font-weight: 700;
@@ -29,19 +34,20 @@
   color: #333;
 }
 
+/* Product stock info */
 .product-detail-stock {
   margin-top: 0.5rem;
   color: #777;
 }
 
+/* Action buttons container */
 .product-detail-actions {
   margin-top: 1.5rem;
   display: flex;
   gap: 1rem;
 }
 
-/* Reutilizamos el mismo estilo de botón que en Home */
-
+/* Reuse the same primary button style as in Home */
 .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -54,6 +60,7 @@
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
+/* Hover effect for primary button */
 .btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);

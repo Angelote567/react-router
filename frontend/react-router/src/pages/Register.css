@@ -1,0 +1,53 @@
+/* Register page container */
+.register-page {
+  max-width: 400px;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+/* Register form card */
+.register-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: grid;
+  gap: 10px;
+}
+
+/* Input fields */
+.register-form input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+}
+
+/* Error message */
+.error {
+  color: crimson;
+  margin-bottom: 0.5rem;
+}
+
+/* Info text below form */
+.info {
+  color: #555;
+  margin-top: 1rem;
+}
+
+/* Primary button (same style as login) */
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.7rem 1.6rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

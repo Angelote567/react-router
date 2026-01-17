@@ -11,19 +11,22 @@ from sqlmodel import Session, select
 from app.db import get_session
 from app.models.user import User
 
+# JWT configuration
 SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE_ME_SUPER_SECRET")
 ALGORITHM = "HS256"
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))  # 24h
-MAX_BCRYPT_BYTES = 72
+MAX_BCRYPT_BYTES = 72  # bcrypt input size limit
 
+# OAuth2 scheme for extracting the Bearer token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def hash_password(password: str) -> str:
+    # Hash a plain password using bcrypt
     pw_bytes = password.encode("utf-8")
     if len(pw_bytes) > MAX_BCRYPT_BYTES:
-        raise ValueError(f"Password demasiado larga (máx {MAX_BCRYPT_BYTES} bytes en UTF-8).")
+        raise ValueError(f"Password is too long (máx {MAX_BCRYPT_BYTES} bytes in UTF-8).")
 
     salt = bcrypt.gensalt(rounds=12)
     hashed = bcrypt.hashpw(pw_bytes, salt)
@@ -31,6 +34,7 @@ def hash_password(password: str) -> str:
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    # Verify a plain password against a stored hash
     return bcrypt.checkpw(
         plain_password.encode("utf-8"),
         hashed_password.encode("utf-8"),
@@ -38,6 +42,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def create_access_token(sub: str, expires_delta: Optional[timedelta] = None) -> str:
+    # Create a JWT access token
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     payload = {"sub": sub, "exp": expire}
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
@@ -47,6 +52,7 @@ def get_current_user(
     token: str = Depends(oauth2_scheme),
     session: Session = Depends(get_session),
 ) -> User:
+    # Retrieve the currently authenticated user from the JWT
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -69,20 +75,22 @@ def get_current_user(
 
 
 def is_admin_email(email: str) -> bool:
+    # Check admin access based on environment variable
     admin_email = os.getenv("ADMIN_EMAIL", "").strip().lower()
     return bool(admin_email) and email.strip().lower() == admin_email
 
 
 def is_admin_user(user: User) -> bool:
-    # 1) Admin real en DB
+    # 1) Admin flag stored in the database
     if getattr(user, "is_admin", False):
         return True
 
-    # 2) Admin por ENV (Render)
+    # 2) Admin defined via environment variable (e.g. Render)
     return is_admin_email(getattr(user, "email", ""))
 
 
 def require_admin(user: User = Depends(get_current_user)) -> User:
+    # Dependency to restrict access to admin users only
     if not is_admin_user(user):
         raise HTTPException(status_code=403, detail="Admin only")
     return user

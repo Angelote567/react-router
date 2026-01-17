@@ -15,12 +15,12 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers || {});
   if (!headers.has("Content-Type")) headers.set("Content-Type", "application/json");
 
-  // Header de pedidos (tu sistema)
+  // Orders header (your current system)
   if (email && !headers.has("X-User-Email")) {
     headers.set("X-User-Email", email);
   }
 
-  // ✅ CLAVE: mandar Bearer token si existe
+  // Key detail: send Bearer token if available
   if (token && !headers.has("Authorization")) {
     headers.set("Authorization", `Bearer ${token}`);
   }

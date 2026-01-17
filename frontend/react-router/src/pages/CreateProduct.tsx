@@ -12,6 +12,7 @@ type FormState = {
   currency: string;
 };
 
+// Admin form to create a new product
 export default function CreateProduct() {
   const { token } = useAuth();
 
@@ -40,8 +41,9 @@ export default function CreateProduct() {
     setError(null);
     setSuccess(null);
 
+    // Require authentication (admin)
     if (!token) {
-      setError("No estás autenticado. Inicia sesión como admin.");
+      setError("You are not authenticated. Please log in as an admin.");
       return;
     }
 
@@ -49,20 +51,21 @@ export default function CreateProduct() {
     const stockNumber = Number(form.stock);
 
     if (!form.title.trim()) {
-      setError("El título es obligatorio.");
+      setError("Title is required.");
       return;
     }
 
     if (isNaN(priceNumber) || priceNumber <= 0) {
-      setError("El precio debe ser un número mayor que 0.");
+      setError("Price must be a number greater than 0.");
       return;
     }
 
     if (isNaN(stockNumber) || stockNumber < 0) {
-      setError("El stock debe ser un número mayor o igual que 0.");
+      setError("Stock must be a number greater than or equal to 0.");
       return;
     }
 
+    // Generate slug from title if not provided
     const slug =
       form.slug.trim() ||
       form.title
@@ -92,7 +95,7 @@ export default function CreateProduct() {
         body: JSON.stringify(body),
       });
 
-      setSuccess("Producto creado correctamente ✅");
+      setSuccess("Product created successfully ✅");
       setForm({
         title: "",
         description: "",
@@ -103,7 +106,7 @@ export default function CreateProduct() {
       });
     } catch (err: any) {
       console.error(err);
-      setError(err?.message ? String(err.message) : "No se pudo crear el producto.");
+      setError(err?.message ? String(err.message) : "The product could not be created.");
     } finally {
       setLoading(false);
     }
@@ -111,38 +114,38 @@ export default function CreateProduct() {
 
   return (
     <div className="create-product">
-      <h1>Nuevo producto</h1>
+      <h1>New Product</h1>
 
       <form className="create-form" onSubmit={handleSubmit}>
         {error && <p className="error">{error}</p>}
         {success && <p className="success">{success}</p>}
 
         <div className="form-group">
-          <label htmlFor="title">Título</label>
+          <label htmlFor="title">Title</label>
           <input
             id="title"
             name="title"
             value={form.title}
             onChange={handleChange}
-            placeholder="Camiseta USJ edición limitada"
+            placeholder="USJ limited edition T-shirt"
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="description">Descripción</label>
+          <label htmlFor="description">Description</label>
           <textarea
             id="description"
             name="description"
             value={form.description}
             onChange={handleChange}
-            placeholder="Descripción del producto"
+            placeholder="Product description"
             rows={3}
           />
         </div>
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="price">Precio (€)</label>
+            <label htmlFor="price">Price (€)</label>
             <input
               id="price"
               name="price"
@@ -166,7 +169,7 @@ export default function CreateProduct() {
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="currency">Moneda</label>
+            <label htmlFor="currency">Currency</label>
             <select id="currency" name="currency" value={form.currency} onChange={handleChange}>
               <option value="EUR">EUR</option>
               <option value="USD">USD</option>
@@ -174,20 +177,20 @@ export default function CreateProduct() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="slug">Slug (opcional)</label>
+            <label htmlFor="slug">Slug (optional)</label>
             <input
               id="slug"
               name="slug"
               value={form.slug}
               onChange={handleChange}
-              placeholder="camiseta-usj-edicion-limitada"
+              placeholder="usj-limited-edition-t-shirt"
             />
           </div>
         </div>
 
         <div className="form-actions">
           <button className="submit-btn" type="submit" disabled={loading}>
-            {loading ? "Guardando..." : "Crear producto"}
+            {loading ? "Saving..." : "Create product"}
           </button>
         </div>
       </form>

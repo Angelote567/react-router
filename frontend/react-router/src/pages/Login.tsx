@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 export const API_BASE =
   import.meta.env.VITE_API_BASE ?? "http://127.0.0.1:8000";
 
+// Login page
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,6 +15,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Redirect destination after login
   const from = (location.state as any)?.from ?? "/";
 
   const submit = async (e: React.FormEvent) => {
@@ -27,7 +29,7 @@ export default function Login() {
     });
 
     if (!res.ok) {
-      setError("Credenciales incorrectas");
+      setError("Invalid credentials");
       return;
     }
 
@@ -39,7 +41,6 @@ export default function Login() {
     });
 
     navigate(from, { replace: true });
-
   };
 
   return (
@@ -63,7 +64,7 @@ export default function Login() {
 
         {error && <div style={{ color: "crimson", marginBottom: 10 }}>{error}</div>}
 
-        <button type="submit">Entrar</button>
+        <button type="submit">Log in</button>
       </form>
     </div>
   );

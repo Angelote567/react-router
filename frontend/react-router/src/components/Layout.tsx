@@ -12,18 +12,20 @@ export default function Layout() {
     <div className="layout">
       <header className="header">
         <nav className="nav">
+          {/* Main navigation links */}
           <NavLink to="/" end className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
             Home
           </NavLink>
 
           <NavLink to="/cart" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
-            Carrito ({totalItems})
+            Cart ({totalItems})
           </NavLink>
 
           <NavLink to="/orders" className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
-            Mis pedidos
+            My Orders
           </NavLink>
 
+          {/* Admin-only link */}
           {isAdmin && (
             <NavLink
               to="/admin/products"
@@ -35,11 +37,12 @@ export default function Layout() {
 
           <div className="spacer" />
 
+          {/* Authentication section */}
           {isAuthenticated ? (
             <>
               <span className="user-pill">{user?.email}</span>
               <button className="nav-link logout-button" onClick={logout}>
-                Cerrar sesión
+                Log out
               </button>
             </>
           ) : (
@@ -48,13 +51,13 @@ export default function Layout() {
                 to="/login"
                 className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
               >
-                Iniciar sesión
+                Log in
               </NavLink>
               <NavLink
                 to="/register"
                 className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
               >
-                Registrarse
+                Register
               </NavLink>
             </>
           )}
@@ -62,6 +65,7 @@ export default function Layout() {
       </header>
 
       <main className="main">
+        {/* Nested route content */}
         <Outlet />
       </main>
     </div>

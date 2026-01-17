@@ -12,25 +12,26 @@ import AdminProducts from "./pages/AdminProducts";
 import CreateProduct from "./pages/CreateProduct";
 import EditProduct from "./pages/EditProduct";
 
-// Guards
+// Route guards
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminProtectedRoute } from "./components/AdminProtectedRoute";
 
+// Application router configuration
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
-      // públicas
+      // Public routes
       { index: true, element: <Home /> },
       { path: "products/:productId", element: <ProductDetail /> },
       { path: "cart", element: <Cart /> },
 
-      // auth
+      // Authentication routes
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
 
-      // usuario logueado
+      // Authenticated user routes
       {
         path: "orders",
         element: (
@@ -40,7 +41,7 @@ export const router = createBrowserRouter([
         ),
       },
 
-      // admin
+      // Admin-only routes
       {
         path: "admin/products",
         element: (
@@ -66,7 +67,7 @@ export const router = createBrowserRouter([
         ),
       },
 
-      // fallback
+      // Fallback route (redirect to home)
       { path: "*", element: <Navigate to="/" replace /> },
     ],
   },

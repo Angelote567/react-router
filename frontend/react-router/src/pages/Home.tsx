@@ -18,11 +18,13 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Load products on first render
     api<Product[]>("/products/")
       .then(setProducts)
       .catch((e) => setError(String(e.message ?? e)));
   }, []);
 
+  // Filter products by title/description
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
     if (!query) return products;
@@ -35,8 +37,9 @@ export default function Home() {
   }, [products, q]);
 
   async function deleteAccount() {
-    if (!confirm("¿Seguro que quieres eliminar tu cuenta? Esta acción no se puede deshacer.")) return;
-    if (!token) return alert("No estás logueado");
+    // Confirm destructive action
+    if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) return;
+    if (!token) return alert("You are not logged in");
 
     const res = await fetch(`${API_BASE}/auth/me`, {
       method: "DELETE",
@@ -45,7 +48,7 @@ export default function Home() {
 
     if (!res.ok) {
       const txt = await res.text().catch(() => "");
-      alert(`No se pudo eliminar la cuenta (${res.status}). ${txt}`);
+      alert(`Could not delete the account (${res.status}). ${txt}`);
       return;
     }
 
@@ -57,7 +60,7 @@ export default function Home() {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      {/* barra superior de la página */}
+      {/* Top bar of the page */}
       <div
         style={{
           display: "flex",
@@ -66,7 +69,7 @@ export default function Home() {
           gap: 12,
         }}
       >
-        <h1 style={{ margin: 0 }}>Productos</h1>
+        <h1 style={{ margin: 0 }}>Products</h1>
 
         {token && (
           <button
@@ -82,16 +85,16 @@ export default function Home() {
               whiteSpace: "nowrap",
             }}
           >
-            Eliminar mi cuenta
+            Delete my account
           </button>
         )}
       </div>
 
-      {/* buscador */}
+      {/* Search input */}
       <input
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Buscar productos..."
+        placeholder="Search products..."
         style={{
           padding: 10,
           borderRadius: 12,
@@ -102,9 +105,9 @@ export default function Home() {
       />
 
       {products.length === 0 ? (
-        <p>No hay productos aún.</p>
+        <p>No products yet.</p>
       ) : filtered.length === 0 ? (
-        <p>No hay resultados para “{q}”.</p>
+        <p>No results for “{q}”.</p>
       ) : (
         <div style={{ display: "grid", gap: 10 }}>
           {filtered.map((p) => (
@@ -145,6 +148,7 @@ export default function Home() {
                 <button
                   disabled={p.stock <= 0}
                   onClick={(e) => {
+                    // Prevent navigating to product detail when clicking the button
                     e.preventDefault();
                     e.stopPropagation();
                     addToCart(p);
@@ -159,7 +163,7 @@ export default function Home() {
                     cursor: p.stock > 0 ? "pointer" : "not-allowed",
                   }}
                 >
-                  {p.stock > 0 ? "Añadir" : "Sin stock"}
+                  {p.stock > 0 ? "Add" : "Out of stock"}
                 </button>
               </div>
             </Link>

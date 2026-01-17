@@ -1,19 +1,23 @@
+/* Home page container */
 .home-page {
   padding: 2rem 1rem;
 }
 
+/* Main title */
 .home-title {
   text-align: center;
   margin-bottom: 0.5rem;
   color: #333;
 }
 
+/* Subtitle text */
 .home-subtitle {
   text-align: center;
   margin-bottom: 2rem;
   color: #555;
 }
 
+/* Product card */
 .product-card {
   background: white;
   border-radius: 16px;
@@ -26,6 +30,7 @@
   border: 1px solid #eee;
 }
 
+/* Product title */
 .product-title {
   font-size: 1.25rem;
   font-weight: 600;
@@ -33,6 +38,7 @@
   margin-bottom: 0.35rem;
 }
 
+/* Product description */
 .product-description {
   font-size: 0.95rem;
   color: #555;
@@ -40,6 +46,7 @@
   line-height: 1.45;
 }
 
+/* Product price */
 .product-price {
   font-size: 1.1rem;
   font-weight: 600;
@@ -47,17 +54,19 @@
   margin-bottom: 0.25rem;
 }
 
+/* Product stock text */
 .product-stock {
   font-size: 0.9rem;
   color: #777;
 }
 
+/* Product card actions container */
 .product-card-actions {
   display: flex;
   align-items: center;
 }
 
-/* Grid de productos */
+/* Products grid */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -66,8 +75,7 @@
   margin: 0 auto;
 }
 
-/* Botón añadir al carrito */
-
+/* "Add to cart" primary button */
 .btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -78,6 +86,8 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+/* Search bar container */
 .home-search {
   max-width: 800px;
   margin: 1rem auto 0;
@@ -86,6 +96,7 @@
   align-items: center;
 }
 
+/* Search input field */
 .search-input {
   flex: 1;
   padding: 0.75rem 1rem;
@@ -96,11 +107,13 @@
   font-family: inherit;
 }
 
+/* Search input focus state */
 .search-input:focus {
   outline: none;
   border-color: #667eea;
 }
 
+/* Clear search button */
 .search-clear {
   background: #e5e7eb;
   color: #374151;
@@ -111,13 +124,10 @@
   cursor: pointer;
 }
 
+/* Results count text */
 .results-count {
   max-width: 800px;
   margin: 0.75rem auto 1rem;
   color: #666;
   font-size: 0.95rem;
 }
-
-
-
-
